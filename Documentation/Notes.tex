@@ -1,0 +1,44 @@
+\documentclass{article}
+
+\usepackage{mathtools}
+
+\newcommand{\xv}{x_\text{v}}
+\newcommand{\xvdot}{\dot{x}_\text{v}}
+\newcommand{\uv}{u_\text{v}}
+\newcommand{\ka}{k_\text{a}}
+\newcommand{\Kx}{K_x}
+\newcommand{\KF}{K_F}
+
+\title{Exploring implications of passivity of the velocity-force response of the actuator}
+\author{M. V. Sivaselvan}
+\date{February 05, 2024}
+
+\begin{document}
+
+\maketitle
+
+The actuator is represented by the model
+\begin{equation}
+	\begin{aligned}
+		\dot{F} &= -\beta F + d\xv - \ka v \\
+		\xvdot  &= -\alpha \xv + \alpha \uv
+	\end{aligned}
+	\label{eq:ActuatorModel}
+\end{equation}
+with the feedback law
+\begin{equation}
+	\uv = u - \Kx x - \KF F
+	\label{eq:ActuatorFeedback}
+\end{equation}
+
+Questions:
+\begin{enumerate}
+	\item Under what conditions is the $v$--$F$ response (with $u = 0$)of the actuator passive?
+	\item Suppose the actuator $v$--$F$ response is put in feedback with a mass (as shown in Figure XXX).
+		If the actuator is passive, this feedback loop is stable.
+		Stability of this loop can also be analyzed using root-locus plots (varying $\Kx$ and $\KF$).
+		How does stability established in this way compare with stability implied by actuator passivity?
+	\item How can model variability, for example in valve dynamics, be taken into accout in this analysis?
+\end{enumerate}
+
+\end{document}
