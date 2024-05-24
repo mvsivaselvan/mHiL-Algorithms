@@ -34,4 +34,13 @@
 	Controller ends up with integrator not stabilizable
 	Try higher order controller - same issue with higher order controller
 
-3. Run with displacement instead of velocity feedback, hoping for passivity when viewed fro velocity to force
+3.  Run with displacement instead of velocity feedback, hoping for passivity when viewed for velocity to force
+
+4.  Can prove that w->v is positive real => v->F is positive real, so enough to impose passivity constraint on w->v
+
+5.  w->v PR is hard to get with feedback of F and feedforward of x, even if the FB and FF are given separate control structures;
+    There appears to be a "barrier" between the desired and achieved VS that cannot be broken without violating passivity;
+    This has nothing to do with constraints on control effort; even when the control effort constratin is removed,
+    the barrier persists. 
+    The situation changes when the controller is given access to w. Is access to w needed to achieve passivity? If so, why?
+    

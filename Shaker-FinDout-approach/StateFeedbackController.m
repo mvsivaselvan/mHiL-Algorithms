@@ -40,18 +40,24 @@ ssVS = ss(AVS, BVS, CVS, DVS);
 ssVS.InputName = 'w';
 ssVS.OutputName = 'xVS';
 
-ssController = tunableSS('Controller',2,1,2);
-ssController.InputName = {'x','F'};
-ssController.OutputName = 'u';
+ssFBController = tunableSS('FBController',4,1,1);
+ssFBController.InputName = {'F'};
+ssFBController.OutputName = 'uFB';
+
+ssFFController = tunableSS('FFController',4,1,2);
+ssFFController.InputName = {'x','w'};
+ssFFController.OutputName = 'uFF';
 
 S1 = sumblk('e = xVS - x');
-T0 = connect(ssVS, ssAct, ssController, S1, 'w', {'e','x','v','xVS','u'});
+S2 = sumblk('u = uFB + uFF');
+T0 = connect(ssVS, ssAct, ssFBController, ssFFController, S1, S2, ...
+             'w', {'e','x','v','xVS','u'});
 
 s = tf('s');
 
 errorConstr = (s+2*pi*30)^3/(s+2*pi*1000)^3;
 tgError = TuningGoal.Gain('w','e',errorConstr);
-tgError.Stabilize = true; 
+tgError.Stabilize = false; 
 
 controlConstr = (s+2*pi*200)^3/(s+2*pi*100)^3/400;
 tgControl = TuningGoal.Gain('w','u',controlConstr);
@@ -62,7 +68,7 @@ tgPassivity = TuningGoal.Passivity('w','v');
 opt = systuneOptions('RandomStart',20);
 
 [Topt,fSoft,gHard,info]=...
-    systune(T0,tgError,[tgPassivity],opt);
+    systune(T0,tgError,tgPassivity,opt);
 Huwopt_ = tf(getIOTransfer(Topt,'w','u'));
 Hvwopt_ = tf(getIOTransfer(Topt,'w','v'));
 Hxwopt_ = tf(getIOTransfer(Topt,'w','x'));
@@ -100,7 +106,6 @@ ssHydCL = connect(ssHyd, controller, 'x', 'F');
 figure(301),
     bode(ssHydCL)
 
-s = tf('s');
 figure(302),
     nyquist(-ssHydCL/s)
 
