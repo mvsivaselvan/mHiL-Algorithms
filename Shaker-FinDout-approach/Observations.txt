@@ -1,0 +1,37 @@
+1.	Actuator model (displacement and force feedback, Ke = 1, Kp = 0.005):
+	Aact = [0 1 0 0; 0 0 1/m 0; 0 -kact -bet d; -Ke*alph 0 -Kp*alph -alph];
+	Bact = [0 0; 0 1/m; 0 0; Ke*alph 0];
+	Cact = [1 0 0 0; 0 1 0 0; 0 0 1 0];
+	Dact = [];
+	ssAct = ss(Aact, Bact, Cact, Dact);
+	ssAct.InputName = {'u','w'};
+	ssAct.OutputName = {'x','v','F'};
+
+	Controller setup:
+	ssController = tunableSS('Controller',3,1,2);
+	ssController.InputName = {'v','F'};
+	ssController.OutputName = 'u';
+
+	controller obtained:
+	From input 1 to output:
+  -121.6 s^3 - 4.71e04 s^2 - 2.025e05 s - 7.416e07
+  ------------------------------------------------
+      s^3 + 859.9 s^2 + 1.909e05 s + 4.023e06
+ 
+	From input 2 to output:
+  -0.1032 s^3 + 5.156 s^2 - 2087 s + 2.045e04
+  -------------------------------------------
+    s^3 + 859.9 s^2 + 1.909e05 s + 4.023e06
+	
+	
+2.	Actuator model (open loop - remove Ke from B and then set Ke=0, Kp = 0):
+	Ke = 0; Kp = 0;
+	Aact = [0 1 0 0; 0 0 1/m 0; 0 -kact -bet d; -Ke*alph 0 -Kp*alph -alph];
+	Bact = [0 0; 0 1/m; 0 0; alph 0];
+	Cact = [1 0 0 0; 0 1 0 0; 0 0 1 0];
+	
+	Controller setup: Same as above
+	Controller ends up with integrator not stabilizable
+	Try higher order controller - same issue with higher order controller
+
+3. Run with displacement instead of velocity feedback, hoping for passivity when viewed fro velocity to force
