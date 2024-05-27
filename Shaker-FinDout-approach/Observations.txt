@@ -40,7 +40,11 @@
 
 5.  w->v PR is hard to get with feedback of F and feedforward of x, even if the FB and FF are given separate control structures;
     There appears to be a "barrier" between the desired and achieved VS that cannot be broken without violating passivity;
-    This has nothing to do with constraints on control effort; even when the control effort constratin is removed,
+    This has nothing to do with constraints on control effort; even when the control effort constraint is removed,
     the barrier persists. 
     The situation changes when the controller is given access to w. Is access to w needed to achieve passivity? If so, why?
-    
+	
+6.	When the actuator stiffness ka is increased 10 fold to 93000, the barrier goes away!
+	The updated PDF documentation and Mathematica notebook show how ka limits kVS through the sign 
+	of the leading coefficient of the ensignant in checking for passivity;
+	although this is derived with common control structure for feedback and feedforward.

@@ -40,12 +40,12 @@ ssVS = ss(AVS, BVS, CVS, DVS);
 ssVS.InputName = 'w';
 ssVS.OutputName = 'xVS';
 
-ssFBController = tunableSS('FBController',4,1,1);
+ssFBController = tunableSS('FBController',2,1,1);
 ssFBController.InputName = {'F'};
 ssFBController.OutputName = 'uFB';
 
-ssFFController = tunableSS('FFController',4,1,2);
-ssFFController.InputName = {'x','w'};
+ssFFController = tunableSS('FFController',2,1,1);
+ssFFController.InputName = {'x'};
 ssFFController.OutputName = 'uFF';
 
 S1 = sumblk('e = xVS - x');
