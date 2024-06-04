@@ -47,4 +47,5 @@
 6.	When the actuator stiffness ka is increased 10 fold to 93000, the barrier goes away!
 	The updated PDF documentation and Mathematica notebook show how ka limits kVS through the sign 
 	of the leading coefficient of the ensignant in checking for passivity;
-	although this is derived with common control structure for feedback and feedforward.
+	although this is derived with common control structure for feedback and feedforward,
+    and neglecting valve dynamics for simplicity.

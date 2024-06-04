@@ -13,8 +13,8 @@ f = w/2/pi; % Hz
 zet = 0.02; % let's take 2% damping
 
 %% Actuator data
-kact = 9300; %lb/in
-d = 25000; % lb/s/V
+kact = 93000; %lb/in
+d = 250000; % lb/s/V
 alph = 2*pi*25; % rad/s
 bet = 2*pi*0.5; % rad/s
 Kp = 0.005;
@@ -40,24 +40,18 @@ ssVS = ss(AVS, BVS, CVS, DVS);
 ssVS.InputName = 'w';
 ssVS.OutputName = 'xVS';
 
-ssFBController = tunableSS('FBController',2,1,1);
-ssFBController.InputName = {'F'};
-ssFBController.OutputName = 'uFB';
-
-ssFFController = tunableSS('FFController',2,1,1);
-ssFFController.InputName = {'x'};
-ssFFController.OutputName = 'uFF';
+ssController = tunableSS('Controller',1,1,2);
+ssController.InputName = {'x','F'};
+ssController.OutputName = 'u';
 
 S1 = sumblk('e = xVS - x');
-S2 = sumblk('u = uFB + uFF');
-T0 = connect(ssVS, ssAct, ssFBController, ssFFController, S1, S2, ...
-             'w', {'e','x','v','xVS','u'});
+T0 = connect(ssVS, ssAct, ssController, S1, 'w', {'e','x','v','xVS','u'});
 
 s = tf('s');
 
 errorConstr = (s+2*pi*30)^3/(s+2*pi*1000)^3;
 tgError = TuningGoal.Gain('w','e',errorConstr);
-tgError.Stabilize = false; 
+tgError.Stabilize = true; 
 
 controlConstr = (s+2*pi*200)^3/(s+2*pi*100)^3/400;
 tgControl = TuningGoal.Gain('w','u',controlConstr);
@@ -68,7 +62,7 @@ tgPassivity = TuningGoal.Passivity('w','v');
 opt = systuneOptions('RandomStart',20);
 
 [Topt,fSoft,gHard,info]=...
-    systune(T0,tgError,tgPassivity,opt);
+    systune(T0,tgError,[tgPassivity],opt);
 Huwopt_ = tf(getIOTransfer(Topt,'w','u'));
 Hvwopt_ = tf(getIOTransfer(Topt,'w','v'));
 Hxwopt_ = tf(getIOTransfer(Topt,'w','x'));
@@ -81,10 +75,11 @@ figure(202),
 
 figure(203),
     bode(Huwopt_, controlConstr)
+
 return
 %% Passivity analysis of hydraulic system
 controller = ss(Topt.blocks.Controller);
-controller.InputName = {'x','v','F'};
+controller.InputName = {'x','F'};
 controller.OutputName = 'uv';
 
 % Rewrite hydraulic system dynamics with the coordinate transformation, 
@@ -106,6 +101,7 @@ ssHydCL = connect(ssHyd, controller, 'x', 'F');
 figure(301),
     bode(ssHydCL)
 
+s = tf('s');
 figure(302),
     nyquist(-ssHydCL/s)
 
