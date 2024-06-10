@@ -13,10 +13,10 @@ f = w/2/pi; % Hz
 zet = 0.01; % let's take 2% damping
 
 %% Actuator data
-kact = 9300; %lb/in
-d = 25000; % lb/s/V
-alph = 2*pi*25; % rad/s
-bet = 2*pi*0.5; % rad/s
+kact = ureal('kact',9300,'percentage',10); %lb/in
+d = ureal('d',25000,'percentage',10); % lb/s/V
+alph = ureal('alph',2*pi*25,'plusminus',[-1 5]); % rad/s
+bet = ureal('bet',2*pi*0.5,'plusminus',10); % rad/s
 Kp = 0.005;
 Ke = 1;
 mtower = Itower/larm^2;
@@ -27,7 +27,7 @@ Ke = 0; Kp = 0;
 Aact = [0 1 0 0; 0 0 1/m 0; 0 -kact -bet d; -Ke*alph 0 -Kp*alph -alph];
 Bact = [0 0; 0 1/m; 0 0; alph 0];
 Cact = [1 0 0 0; 0 1 0 0; 0 0 1 0];
-Dact = [];
+Dact = 0;
 ssAct = ss(Aact, Bact, Cact, Dact);
 ssAct.InputName = {'u','w'};
 ssAct.OutputName = {'x','v','F'};
@@ -111,7 +111,7 @@ figure(303),
 
 figure(304),
     bode(controller(1), controlConstr)
-
+return
 %% Robustness analysis of passivity (positive realness) of control solution
 betu = ureal('beta',bet,'percentage',10);
 kactu = ureal('kact',kact,'percentage',10);
