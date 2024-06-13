@@ -10,13 +10,13 @@ kVS = kVSrot/larm^2; % lb/in
 mVS = IVS/larm^2; % lb-s^2/in
 w = sqrt(kVS/mVS); % rad/s
 f = w/2/pi; % Hz
-zet = 0.01; % let's take 2% damping
+zet = 0.02; % let's take 2% damping
 
 %% Actuator data
 kact = ureal('kact',9300,'percentage',10); %lb/in
 d = ureal('d',25000,'percentage',10); % lb/s/V
 alph = ureal('alph',2*pi*25,'plusminus',[-1 5]); % rad/s
-bet = ureal('bet',2*pi*0.5,'plusminus',10); % rad/s
+bet = ureal('bet',2*pi*0.5,'percentage',10); % rad/s
 Kp = 0.005;
 Ke = 1;
 mtower = Itower/larm^2;
@@ -49,7 +49,7 @@ T0=connect(ssVS,ssAct,ssController,S1,'w',{'e','x','v','F','xVS','u'},{'x','F'})
 
 s = tf('s');
 
-errorConstr = (s+2*pi*30)^3/(s+2*pi*1000)^3;
+errorConstr = (s+2*pi*1)^3/(s+2*pi*5)^3;
 tgError = TuningGoal.Gain('w','e',errorConstr);
 tgError.Stabilize = true; 
 
@@ -60,7 +60,7 @@ tgControl.Openings = {'x','F'};
 
 tgPassivity = TuningGoal.Passivity('w','v');
 
-opt = systuneOptions('RandomStart',20);
+opt = systuneOptions('RandomStart',10, 'UseParallel', true);
 
 [Topt,fSoft,gHard,info]=...
     systune(T0,tgError,[tgControl, tgPassivity],opt);
@@ -111,31 +111,3 @@ figure(303),
 
 figure(304),
     bode(controller(1), controlConstr)
-return
-%% Robustness analysis of passivity (positive realness) of control solution
-betu = ureal('beta',bet,'percentage',10);
-kactu = ureal('kact',kact,'percentage',10);
-du = ureal('d',d,'percentage',10);
-alphu = ureal('alph',alph,'plusminus',[-1 5]);
-taud = 0.001; % sample delay
-
-AHydu = [-betu du; 0 -alphu];
-BHydu = [betu*kactu 0; 0 alphu];
-CHydu = [1 0];
-DHydu = [-kactu 0];
-ssHydu = ss(AHydu, BHydu, CHydu, DHydu);
-ssHydu.InputName = {'x','uv'};
-ssHydu.OutputName = 'F';
-
-% introduce sample delay in the controller and do a pade approximation of
-% the delay
-controllerd = controller;
-controllerd.OutputDelay = taud;
-%controllerd = pade(controllerd, 2);
-
-ssHydCLu = connect(ssHydu, controllerd, 'x', 'F');
-
-[ssHydCLu_samples, sampleValues] = usample(ssHydCLu,10);
-
-figure(401),
-    nyquist(-ssHydCLu_samples/s)

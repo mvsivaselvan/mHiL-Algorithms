@@ -68,12 +68,13 @@ ssController.InputName = {'x','F'};
 ssController.OutputName = 'u';
 
 S1 = sumblk('e = xVS - x');
-T0=connect(ssVS,ssAct(:,:,1),ssController,S1,'w',{'e','x','v','F','xVS','u'},{'x','F'});
+%T0=connect(ssVS,ssAct(:,:,1),ssController,S1,'w',{'e','x','v','F','xVS','u'},{'x','F'});
+T0=connect(ssVS,ssAct,ssController,S1,'w',{'e','x','v','F','xVS','u'},{'x','F'});
 
 %% Constraints
 s = tf('s');
 
-errorConstr = (s+2*pi*30)^3/(s+2*pi*1000)^3;
+errorConstr = (s+2*pi*1)^3/(s+2*pi*5)^3;
 tgError = TuningGoal.Gain('w','e',errorConstr);
 tgError.Stabilize = true; 
 
@@ -96,7 +97,7 @@ Hvwopt_ = tf(getIOTransfer(Topt,'w','v'));
 Hxwopt_ = tf(getIOTransfer(Topt,'w','x'));
 Huxopt_ = tf(getIOTransfer(Topt,'x','u',{'x','F'}));
 
-if 0
+if 1
 figure(201),
     bode(ssVS, Hxwopt_)
 
@@ -107,7 +108,7 @@ figure(203),
     bode(Huxopt_, controlConstr)
 end 
 
-%% Analyze effect of controller designed on the basis of ssAct1 on ssAct2
+%% Analyze effect of controller designed on the basis of ssAct1 on ssAct2 and ssAct3
 controller = ss(Topt.Blocks.Controller);
 controller.InputName = {'x','F'};
 controller.OutputName = 'u';
