@@ -111,3 +111,10 @@ figure(303),
 
 figure(304),
     bode(controller(1), controlConstr)
+
+%% Digital controller
+controllerd = c2d(controller, 0.001, 'tustin');
+
+addpath '..\matlab2VeriStand\'
+writeController2ParamFile(controllerd, 'ControllerParm.txt');
+rmpath '..\matlab2VeriStand\'
