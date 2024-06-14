@@ -9,17 +9,17 @@ Ac = Ac(:);
 str = matlab2VSparam(Ac);
 fprintf(fid,'%s\n',str);
 
-Bc = controller_ss.B';
+Bc = controller.B';
 Bc = Bc(:);
 str = matlab2VSparam(Bc);
 fprintf(fid,'%s\n',str);
 
-Cc = controller_ss.C';
+Cc = controller.C';
 Cc = Cc(:);
 str = matlab2VSparam(Cc);
 fprintf(fid,'%s\n',str);
 
-Dc = controller_ss.D';
+Dc = controller.D';
 Dc = Dc(:);
 str = matlab2VSparam(Dc);
 fprintf(fid,'%s\n',str);

@@ -116,5 +116,5 @@ figure(304),
 controllerd = c2d(controller, 0.001, 'tustin');
 
 addpath '..\matlab2VeriStand\'
-writeController2ParamFile(controllerd, 'ControllerParm.txt');
+writeController2ParamFile(controllerd, '.\ControllerParm.txt');
 rmpath '..\matlab2VeriStand\'
