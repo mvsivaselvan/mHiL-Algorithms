@@ -1,4 +1,4 @@
-function str = matlab2VSparam(var,delim)
+function str = matlab2VSparam(var)
 
 % input: 
 % var = nx1 vector
@@ -6,8 +6,8 @@ function str = matlab2VSparam(var,delim)
 % str = string: 'varname=[var(1) delim var(2) delim ...var(n)]'
 
 str = inputname(1);
-str = strcat(str,'=[');
+str = str + "=[";
 for n = 1:length(var)-1
-    str = strcat(str,num2str(var(n)),delim);
+    str = str + num2str(var(n)) + " ";
 end
-str = strcat(str,num2str(var(end)),']');
+str = str + num2str(var(end)) + "]";
