@@ -13,10 +13,11 @@ f = w/2/pi; % Hz
 zet = 0.02; % let's take 2% damping
 
 %% Actuator data
-kact = ureal('kact',9300,'percentage',10); %lb/in
-d = ureal('d',25000,'percentage',10); % lb/s/V
-alph = ureal('alph',2*pi*25,'plusminus',[-1 5]); % rad/s
-bet = ureal('bet',2*pi*0.5,'percentage',10); % rad/s
+kact = 9300; % ureal('kact',9300,'percentage',5); %lb/in
+d = 25000; % ureal('d',25000,'percentage',5); % lb/s/V
+alph = 2*pi*25; % ureal('alph',2*pi*25,'plusminus',[-1 5]); % rad/s
+bet = 2*pi*0.5; % ureal('bet',2*pi*0.5,'percentage',5); % rad/s
+ktopple = -30; % lb/in
 Kp = 0.005;
 Ke = 1;
 mtower = Itower/larm^2;
@@ -24,7 +25,7 @@ m = mtower;
 
 %% Optimization approach
 Ke = 0; Kp = 0;
-Aact = [0 1 0 0; 0 0 1/m 0; 0 -kact -bet d; -Ke*alph 0 -Kp*alph -alph];
+Aact = [0 1 0 0; -ktopple/m 0 1/m 0; 0 -kact -bet d; -Ke*alph 0 -Kp*alph -alph];
 Bact = [0 0; 0 1/m; 0 0; alph 0];
 Cact = [1 0 0 0; 0 1 0 0; 0 0 1 0];
 Dact = 0;
@@ -49,18 +50,18 @@ T0=connect(ssVS,ssAct,ssController,S1,'w',{'e','x','v','F','xVS','u'},{'x','F'})
 
 s = tf('s');
 
-errorConstr = (s+2*pi*1)^3/(s+2*pi*5)^3;
+errorConstr = (s+2*pi*1)/(s+2*pi*5);
 tgError = TuningGoal.Gain('w','e',errorConstr);
 tgError.Stabilize = true; 
 
-controlConstr = (s+2*pi*50)/(s+2*pi*4)*0.8;
+controlConstr = (s+2*pi*50)/(s+2*pi*4)*0.7;
 tgControl = TuningGoal.Gain('x','u',controlConstr);
 tgControl.Stabilize = false;
 tgControl.Openings = {'x','F'};
 
 tgPassivity = TuningGoal.Passivity('w','v');
 
-opt = systuneOptions('RandomStart',10, 'UseParallel', true);
+opt = systuneOptions('RandomStart',10, 'UseParallel', false);
 
 [Topt,fSoft,gHard,info]=...
     systune(T0,tgError,[tgControl, tgPassivity],opt);
@@ -112,9 +113,12 @@ figure(303),
 figure(304),
     bode(controller(1), controlConstr)
 
+figure(305),
+    bode(controller(2))
+
 %% Digital controller
 controllerd = c2d(controller, 0.001, 'tustin');
-
+return
 addpath '..\matlab2VeriStand\'
 writeController2ParamFile(controllerd, '.\ControllerParm.txt');
 rmpath '..\matlab2VeriStand\'
