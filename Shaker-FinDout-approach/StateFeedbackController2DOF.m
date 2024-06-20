@@ -91,31 +91,8 @@ tgControl.Openings = {'x(1)','x(2)','F(1)','F(2)'};
 
 tgPassivity = TuningGoal.Passivity({'w(1)','w(2)'},{'v(1)','v(2)'});
 
-opt = systuneOptions('RandomStart',10, 'UseParallel', false);
+opt = systuneOptions('RandomStart',0, 'UseParallel', false);
 
-%% Evaluate 1 DOF solution
-if 0
-load controller1DOF.mat
-controller = blkdiag(controller1DOF,controller1DOF);
-controller.InputName = {'x(1)','F(1)','x(2)','F(2)'};
-controller.OutputName = {'u(1)','u(2)'};
-
-T1DOF = connect(ssVS,ssAct,controller,S1_1,S1_2,...
-                {'w(1)','w(2)'},...
-                {'e(1)','e(2)','x(1)','x(2)','v(1)','v(2)','F(1)','F(2)',...
-                 'xVS(1)','xVS(2)','u(1)','u(2)'},...
-                {'x(1)','x(2)','F(1)','F(2)'});
-figure(501),
-    viewGoal(tgError, T1DOF);
-
-figure(502),
-    viewGoal(tgControl, T1DOF);
-
-figure(503),
-    viewGoal(tgPassivity, T1DOF);
-
-return
-end
 %% Run optimization
 [Topt,fSoft,gHard,info]=...
     systune(T0,tgError,[tgControl, tgPassivity],opt);
